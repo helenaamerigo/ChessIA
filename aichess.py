@@ -476,39 +476,9 @@ class Aichess():
         # You have to also implement the heuristic function h().
         frontier.append((self.h(currentState),currentState))
 
-    def findFinalStates(self, state):
-        kingBState = self.getPieceState(self.chess.board.currentStateB, 12)
-        
-        if kingBState[0] <=5:
-            finalKingWState = [kingBState[0] + 2, kingBState[1], 6]
-        else:
-            finalKingWState = [kingBState[0] - 2, kingBState[1], 6]
-
-        if kingBState[1] <= 5:
-            finalRookWState = [kingBState[0], kingBState[1] + 2, 2]
-        else:
-            finalRookWState = [kingBState[0], kingBState[1] - 2, 2]
-
-        finalStates = [finalRookWState, finalKingWState]
-
-        return finalStates
-
-    def hAux(self, state, finalState):
-        if (state[0][2] == 2):
-            rook = state[0]
-            king = state[1]
-        else:
-            rook = state[1]
-            king = state[0]
-
-        rookDistance = (rook[0] - finalState[0][0]) + (rook[1] - finalState[0][1])
-        kingDistance = (king[0] - finalState[1][0]) + (king[1] - finalState[1][1])
-
-        return (rookDistance + kingDistance)
-        
-
+    
     def h(self, state):
-         
+        kingBState = self.getPieceState(self.chess.board.currentStateB, 12)
 
         if (state[0][2] == 2):
             rook = state[0]
@@ -517,8 +487,16 @@ class Aichess():
             rook = state[1]
             king = state[0]
 
-        rookDistance = (rook[0] - finalState[0][0]) + (rook[1] - finalState[0][1])
-        kingDistance = (king[0] - finalState[1][0]) + (king[1] - finalState[1][1])
+        if rook[0] == kingBState[0] and rook[1] < (kingBState[1] - 1):
+            rookDistance = 0
+        elif rook[0] == kingBState[0] and rook[1] > (kingBState[1] + 1):
+            rookDistance = 0
+        elif rook[0] != kingBState[0] and rook[1] == kingBState[1]:
+            rookDistance = 2
+        else:
+            rookDistance = 1 
+
+        kingDistance = max(abs(king[0] - (kingBState[0] + 2)), abs(king[1] - kingBState[1]))
 
         return (rookDistance + kingDistance)
 
