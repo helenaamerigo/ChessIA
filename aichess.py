@@ -476,6 +476,42 @@ class Aichess():
         # You have to also implement the heuristic function h().
         frontier.append((self.h(currentState),currentState))
 
+        self.listVisitedStates.append(currentState)
+        self.dictPath[str(currentState)] = (None, 0)
+
+        previousState = currentState
+        previousG = 0
+
+        while len(frontier) > 0:
+            frontier.sort(key=lambda x: x[0])  
+            currentWhiteState = frontier.pop(0)[1]  
+
+            if currentWhiteState[0][2] == 2:
+                currentWhiteState = [currentWhiteState[0], currentWhiteState[1]]
+            else:
+                currentWhiteState = [currentWhiteState[1], currentWhiteState[0]]
+
+            currentG = self.dictPath[str(currentWhiteState)][1]
+
+            self.movePieces(previousState, previousG, currentWhiteState, currentG)
+
+            if self.isCheckMate(currentWhiteState):
+                self.reconstructPath(currentWhiteState, currentG)
+                break
+
+            # Falta hacer los hijos (actualizar la frontera y el diccionario de padres) y visualizar el tablero
+
+            previousState = currentWhiteState
+            previousG = currentG
+
+
+
+            
+
+
+
+            
+
     
     def h(self, state):
         kingBState = self.getPieceState(self.chess.board.currentStateB, 12)
