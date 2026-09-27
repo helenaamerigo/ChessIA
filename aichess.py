@@ -474,6 +474,11 @@ class Aichess():
         frontier = []
         # Initialize the frontier with the initial state and its heuristic value 
         # You have to also implement the heuristic function h().
+        if currentState[0][2] == 2: #Ordenem amnb la torre primer i el rey segon
+            currentState = [currentState[0], currentState[1]]
+        else:
+            currentState = [currentState[1], currentState[0]]
+            
         frontier.append((self.h(currentState),currentState)) #F(n) = g(n) + h(n), pero ara g es 0, per tant F(n) = h(n)
 
         self.listVisitedStates.append(currentState) #Afegir a la llista de visitats el primer estat
@@ -605,6 +610,7 @@ if __name__ == "__main__":
     aichess.AStarSearch(currentState)
     print("#A* move sequence:", aichess.pathToTarget)
     print("A* End\n")
+    print("Total de moviments:", len(aichess.pathToTarget)- 1, "\n")
     print("Printing final board after A*:")
     aichess.chess.boardSim.print_board()
 
