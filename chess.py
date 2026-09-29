@@ -178,8 +178,8 @@ class Chess():
 
             self.boardSim.board[to[0]][to[1]] = target_piece
             self.boardSim.board[start[0]][start[1]] = None
-            if verbose:
-                print(str(target_piece) + " moved.")
+            #if verbose:
+                #print(str(target_piece) + " moved.")
             if self.turn and self.black_ghost_piece:
                 self.boardSim.board[self.black_ghost_piece[0]][self.black_ghost_piece[1]] = None
             elif not self.turn and self.white_ghost_piece:
@@ -196,12 +196,12 @@ class Chess():
                 aa = self.boardSim.currentStateW[m]               
                 # only the one to move and only for whites so far
                 if self.boardSim.listNames[int(aa[2]-1)] == str(target_piece) and target_piece.color:
-                    if verbose:
-                        print("->piece initial state ",self.boardSim.currentStateW[m])
+                    #if verbose:
+                        #print("->piece initial state ",self.boardSim.currentStateW[m])
                     self.boardSim.currentStateW[m][0] = to[0]
                     self.boardSim.currentStateW[m][1] = to[1]
-                    if verbose:
-                        print("->piece to state ",self.boardSim.currentStateW[m])
+                    #if verbose:
+                        #print("->piece to state ",self.boardSim.currentStateW[m])
                                                        
                    
                #   print("Next States: ",self.board.getListNextStatesW(self.board.currentStateW[m]))
@@ -213,10 +213,10 @@ class Chess():
                 aa = self.board.currentStateB[m]
                 # only the one to move and only for whites so far
                 if self.board.listNames[int(aa[2] - 1)] == str(target_piece) and not target_piece.color:
-                    print("->piece initial state ", self.board.currentStateB[m])
+                    #print("->piece initial state ", self.board.currentStateB[m])
                     self.board.currentStateB[m][0] = to[0]
                     self.board.currentStateB[m][1] = to[1]
-                    print("->piece to state ", self.board.currentStateB[m])
+                    #print("->piece to state ", self.board.currentStateB[m])
 
     #                   print("Next States: ",self.board.getListNextStatesW(self.board.currentStateW[m]))
 
@@ -301,7 +301,7 @@ class Chess():
 
             self.board.board[to[0]][to[1]] = target_piece
             self.board.board[start[0]][start[1]] = None
-            print(str(target_piece) + " moved.")
+            #print(str(target_piece) + " moved.")
 
             if self.turn and self.black_ghost_piece:
                 self.board.board[self.black_ghost_piece[0]][self.black_ghost_piece[1]] = None

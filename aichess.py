@@ -474,72 +474,63 @@ class Aichess():
         frontier = []
         # Initialize the frontier with the initial state and its heuristic value 
         # You have to also implement the heuristic function h().
-        if currentState[0][2] == 2: #Ordenem amnb la torre primer i el rey segon
+        if currentState[0][2] == 2: # Ordenem amnb la torre primer i el rei segon per mantenir la coherencia amb la resta de funcions
             currentState = [currentState[0], currentState[1]]
         else:
             currentState = [currentState[1], currentState[0]]
             
-        frontier.append((self.h(currentState),currentState)) #F(n) = g(n) + h(n), pero ara g es 0, per tant F(n) = h(n)
+        frontier.append((self.h(currentState),currentState)) # F(n) = g(n) + h(n), però ara g es 0, per tant F(n) = h(n)
 
-        self.listVisitedStates.append(currentState) #Afegir a la llista de visitats el primer estat
-        self.dictPath[str(currentState)] = (None, 0) #Marcarlo sense pare i amb g(n) = 0
+        self.listVisitedStates.append(currentState) # Afegim a la llista de visitats el primer estat
+        self.dictPath[str(currentState)] = (None, 0) # Marquem sense pare i amb g(n) = 0
 
-        previousState = currentState #Guardar el estat per fer el moviment de peçes i també la g
+        previousState = currentState # Guardem l'estat per fer el moviment de peçes i també la g
         previousG = 0 
 
-        while len(frontier) > 0: #Bucle mentres hi. hagi estats a al frontera
-            frontier.sort(key=lambda x: x[0])  #Ordenem per el que té la lambda mes baixa (F(n))
-            currentWhiteState = frontier.pop(0)[1]  #Agafem el estat
+        while len(frontier) > 0: # Bucle mentres hi hagi estats a la frontera
+            frontier.sort(key=lambda x: x[0])  # Ordenem pel que té la lambda mes baixa (F(n))
+            currentWhiteState = frontier.pop(0)[1]  # Agafem l'estat
 
-            if currentWhiteState[0][2] == 2: #Ordenem amnb la torre primer i el rey segon
+            if currentWhiteState[0][2] == 2: # Ordenem amnb la torre primer i el rei segon
                 currentWhiteState = [currentWhiteState[0], currentWhiteState[1]]
             else:
                 currentWhiteState = [currentWhiteState[1], currentWhiteState[0]]
 
-            currentG = self.dictPath[str(currentWhiteState)][1] #Agafem la g(n) que ja sabiem (A* search)
+            currentG = self.dictPath[str(currentWhiteState)][1] # Agafem la g(n) que hem trobat (A* search)
 
             self.movePieces(previousState, previousG, currentWhiteState, currentG)
 
-            if self.isCheckMate(currentWhiteState): #Si es mate sortim del bucle, assegurem que es el primer i mes curt ja 
-                self.reconstructPath(currentWhiteState, currentG) #que la frontera esta ordenada per F(n) i el primer que trobem es el mes curt
+            if self.isCheckMate(currentWhiteState): # Si es escac i mat sortim del bucle
+                self.reconstructPath(currentWhiteState, currentG) # Reconstruim el camí fins a l'objectiu, amb la frontera ordenada per F(n) i la g(n) que hem trobat
                 break
 
-            # Falta hacer los hijos (actualizar la frontera y el diccionario de padres) y visualizar el tablero
-            for fill in self.getListNextStatesW(currentWhiteState):
-                g = currentG + 1 #Calculem la G del fill, coomptant q val 1 el moure una pos
-                f = self.h(fill) + g #Calculem la F(n)
-                if (fill[0][2] == 2): #Ordenem les peçes del fill
+            for fill in self.getListNextStatesW(currentWhiteState): # Per a casa fill que podem tenir
+                g = currentG + 1 # Calculem la G del fill, considerant que cada moviment es + 1
+                f = self.h(fill) + g # Calculem la F(n) amb la g i la h
+                if (fill[0][2] == 2): # Ordenem les peces del fill
                     fill = [fill[0], fill[1]]
                 else:
                     fill = [fill[1], fill[0]]
 
-                if(self.isVisited(fill)): #Mirem si l'hem visitat abans
-                    if(g < self.dictPath[str(fill)][1]): #Mirem si la G que tenim ara és mes petita, llavors el actualitzem
+                if(self.isVisited(fill)): # Mirem si hem visitat el fill abans
+                    if(g < self.dictPath[str(fill)][1]): # Mirem si la G que tenim ara és més petita i en cas que sí l'actualitzem
                         self.dictPath[str(fill)] = (currentWhiteState, g)
                         frontier.append((f, fill))
-                else: #Si no l'hem visitat el guardem com visitat
+                else: # Si no hem visitat el fill abans, el guardem com a visitat
                     frontier.append((f, fill))
                     self.listVisitedStates.append(fill)
                     self.dictPath[str(fill)] = (currentWhiteState, g)
 
 
-
+            # Actualitzem l'estat i la g
             previousState = currentWhiteState
             previousG = currentG
 
-
-
-            
-
-
-
-            
-
-    
     def h(self, state):
+        # Guardem l'estat del rei negre per a agafar-ho com a referència
         kingBState = self.getPieceState(self.chess.board.currentStateB, 12)
 
-        #Definir Peçes
+        # Definim l'ordre de les peces per mantenir consistència
         if (state[0][2] == 2):
             rook = state[0]
             king = state[1]
@@ -547,36 +538,37 @@ class Aichess():
             rook = state[1]
             king = state[0]
 
-        #Moviments de la torre
-        if (kingBState[0] == 0 or kingBState[0] == 7): #Rey a una fmarge de dalt o baix
-            if rook[0] == kingBState[0] and rook[1] < (kingBState[1] - 1): #Mateixa X e Y separada a mínim 1 casella
-                rookDistance = 0
-            elif rook[0] == kingBState[0] and rook[1] > (kingBState[1] + 1): #Mateixa X e Y separada a mínim 1 casella
-                rookDistance = 0
-            elif rook[0] != kingBState[0] and rook[1] >= (kingBState[1] - 1) and rook[1] <= (kingBState[1] + 1): #Diferent X pero Y es massa a prop del rey
-                rookDistance = 2
-            else: #Tota la resta
-                rookDistance = 1 
-        else: #Rey a una marge de la dreta o esquerra
-            if rook[1] == kingBState[1] and rook[0] < (kingBState[0] - 1): #Mateixa Y e X separada a mínim 1 casella
-                rookDistance = 0
-            elif rook[1] == kingBState[1] and rook[0] > (kingBState[0] + 1): #Mateixa Y e X separada a mínim 1 casella
-                rookDistance = 0
-            elif rook[1] != kingBState[1] and rook[0] >= (kingBState[0] - 1) and rook[0] <= (kingBState[0] + 1): #Diferent Y pero X es massa a prop del rey
-                rookDistance = 2
-            else: #Tota la resta
-                rookDistance = 1 
+        # Moviments de la torre definits per la posició del rei negre
+        if (kingBState[0] == 0 or kingBState[0] == 7): # En cas que el rei negre es trobi en el marge superior o inferior del tauler
+            if rook[0] == kingBState[0] and rook[1] < (kingBState[1] - 1): # Si es troba a la mateixa X i Y separada a mínim 1 casella
+                rookDistance = 0 # No es mou perquè ja es troba en posició òptima per l'escac i mat
+            elif rook[0] == kingBState[0] and rook[1] > (kingBState[1] + 1): # Si es troba a la mateixa X i Y separada a mínim 1 casella
+                rookDistance = 0 # No es mou perquè ja es troba en posició òptima per l'escac i mat
+            elif rook[0] != kingBState[0] and rook[1] >= (kingBState[1] - 1) and rook[1] <= (kingBState[1] + 1): # Si es troba a diferent X però Y és massa a prop del rei o no té control sobre ell
+                rookDistance = 2 # Es mou dues vegades perquès troba en una posició desfavorable
+            else: # Per a la resta de casos
+                rookDistance = 1  # Es mou només una vegada per arribar a l'objectiu
+        else: # En cas que el rei negre es trobi en el marge dret o esquerre del tauler
+            if rook[1] == kingBState[1] and rook[0] < (kingBState[0] - 1): # Si es troba a la mateixa Y i X separada a mínim 1 casella
+                rookDistance = 0 # No es mou perquè ja es troba en posició òptima per l'escac i mat
+            elif rook[1] == kingBState[1] and rook[0] > (kingBState[0] + 1): # Si es troba a la mateixa Y i X separada a mínim 1 casella
+                rookDistance = 0 # No es mou perquè ja es troba en posició òptima per l'escac i mat
+            elif rook[1] != kingBState[1] and rook[0] >= (kingBState[0] - 1) and rook[0] <= (kingBState[0] + 1): # Si es troba a diferent Y però X és massa a prop del rei o no té control sobre ell
+                rookDistance = 2 # Es mou dues vegades perquès troba en una posició desfavorable
+            else: # Per a la resta de casos
+                rookDistance = 1 # Es mou només una vegada per arribar a l'objectiu
 
-        #Moviments del rey
-        if (kingBState[0] == 0): #Rey a la fila de dalt
+        # Moviments del rei definits per la posició del rei negre
+        if (kingBState[0] == 0): # En cas que el rei negre es trobi en el marge superior del tauler
             kingDistance = max(abs(king[0] - (kingBState[0] + 2)), abs(king[1] - kingBState[1]))
-        elif (kingBState[0] == 7): #Rey a al fila de baix
+        elif (kingBState[0] == 7): # En cas que el rei negre es trobi en el marge inferior del tauler
             kingDistance = max(abs(king[0] - (kingBState[0] - 2)), abs(king[1] - kingBState[1]))
-        elif (kingBState[1] == 0): #Rey a la columna esquerra
+        elif (kingBState[1] == 0): # En cas que el rei negre es trobi en el marge esquerre del tauler
             kingDistance = max(abs(king[0] - kingBState[0]), abs(king[1] - (kingBState[1] + 2)))
-        else: #Rey a la columna dreta
+        else: # En cas que el rei negre es trobi en el marge dret del tauler
             kingDistance = max(abs(king[0] - kingBState[0]), abs(king[1] - (kingBState[1] - 2)))
 
+        # Retorna la suma de les dues distàncies
         return (rookDistance + kingDistance)
 
 
